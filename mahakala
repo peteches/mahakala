@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import ConfigParser
+import time
+from socket import gethostname
+import sys
+from subprocess import Popen, PIPE
+import requests
+
+def getReporter(adapterName):
+	return {
+		'http': httpReporter
+		}.get(adapterName, httpReporter) # default to httpReporter
+class ReporterInterface(object):
+    def __init__(self):
+        pass
+    def report(self, stats):
+        raise NotImplementedError("Please call a real xReporter")
+class httpReporter(ReporterInterface):
+    def __init__(self):
+        pass
+    def report(self, stats):
+        print "Reporting!"
+        response = requests.post( config.get('Reporting', 'serverUrl'), data=stats )
+	
+# Setup
+config = ConfigParser.ConfigParser()
+config.read('mahakala.cfg')
+command = sys.argv
+command.pop(0)
+
+# Collect stats
+stats = {
+	'host': gethostname(),
+	'command': ' '.join(sys.argv),
+	'timeStart': time.time()
+}
+sp = Popen(command, stdout=PIPE, stderr=PIPE)
+stdout, stderr = sp.communicate()
+stats['returnCode'] = sp.returncode
+stats['stdout'] = stdout.strip("\n")
+stats['stderr'] = stderr.strip("\n")
+stats['timeEnd'] = time.time()
+
+# Report stats
+reporter = getReporter(config.get('Reporting', 'reporter'))() # note extra () for instantiation
+reporter.report(stats)
+
+#print response
