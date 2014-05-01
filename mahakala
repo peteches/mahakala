@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import ConfigParser
+import configparser
 import time
 from socket import gethostname
 import sys
@@ -21,9 +21,9 @@ class httpReporter(ReporterInterface):
         pass
     def report(self, stats):
         response = requests.post( config.get('Reporting', 'serverUrl'), data=stats )
-	
+
 # Setup
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read('/etc/mahakala.cfg')
 command = sys.argv
 command.pop(0)
@@ -34,11 +34,12 @@ stats = {
 	'command': ' '.join(sys.argv),
 	'timeStart': time.time()
 }
+
 sp = Popen(command, stdout=PIPE, stderr=PIPE)
 stdout, stderr = sp.communicate()
 stats['returnCode'] = sp.returncode
-stats['stdout'] = stdout.strip("\n")
-stats['stderr'] = stderr.strip("\n")
+stats['stdout'] = stdout
+stats['stderr'] = stderr
 stats['timeEnd'] = time.time()
 
 # Report stats
