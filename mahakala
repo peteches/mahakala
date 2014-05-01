@@ -24,7 +24,7 @@ class httpReporter(ReporterInterface):
 	
 # Setup
 config = ConfigParser.ConfigParser()
-config.read('mahakala.cfg')
+config.read('/etc/mahakala.cfg')
 command = sys.argv
 command.pop(0)
 
