@@ -23,8 +23,16 @@ class httpReporter(ReporterInterface):
         response = requests.post( config.get('Reporting', 'serverUrl'), data=stats )
 
 # Setup
+# This order is significant
+configFiles = [
+    '/etc/mahakala.cfg',
+    os.path.expanduser('~/.mahakala.cfg'),
+    'mahakala.cfg',
+]
 config = configparser.ConfigParser()
-config.read('/etc/mahakala.cfg')
+# reads multiple files, ignores failures and in case of multiple successfull
+# reads last file read has priority. Hence significance of order in configFiles
+config.read(configFiles)
 command = sys.argv
 command.pop(0)
 
